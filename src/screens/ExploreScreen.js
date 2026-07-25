@@ -1,6 +1,3 @@
-src/screens/ExploreScreen.js
-
-javascript
 import React, { useState } from 'react';
 import {
   View,
@@ -22,7 +19,7 @@ const ExploreScreen = ({ navigation }) => {
   const handleSearch = (text) => {
     setSearchQuery(text);
     let filtered = properties;
-    
+
     if (text) {
       filtered = filtered.filter(p =>
         p.title.toLowerCase().includes(text.toLowerCase()) ||
@@ -30,10 +27,10 @@ const ExploreScreen = ({ navigation }) => {
         p.type.toLowerCase().includes(text.toLowerCase())
       );
     }
-    
+
     // Apply sorting
     filtered = [...filtered].sort((a, b) => {
-      switch(sortBy) {
+      switch (sortBy) {
         case 'price-low':
           return a.price - b.price;
         case 'price-high':
@@ -44,7 +41,7 @@ const ExploreScreen = ({ navigation }) => {
           return 0;
       }
     });
-    
+
     setFilteredProperties(filtered);
   };
 
@@ -189,4 +186,3 @@ const styles = StyleSheet.create({
 });
 
 export default ExploreScreen;
-

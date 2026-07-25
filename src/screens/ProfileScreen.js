@@ -1,6 +1,3 @@
-src/screens/ProfileScreen.js
-
-javascript
 import React from 'react';
 import {
   View,
@@ -9,11 +6,11 @@ import {
   TouchableOpacity,
   Image,
   Switch,
+  ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const ProfileScreen = () => {
-  const [notifications, setNotifications] = React.useState(true);
   const [darkMode, setDarkMode] = React.useState(false);
 
   const menuItems = [
@@ -26,7 +23,7 @@ const ProfileScreen = () => {
   ];
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Profile</Text>
       </View>
@@ -85,14 +82,18 @@ const ProfileScreen = () => {
           />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F7FA',
+  },
+  scrollContent: {
     paddingTop: 20,
+    paddingBottom: 30,
   },
   header: {
     paddingHorizontal: 20,

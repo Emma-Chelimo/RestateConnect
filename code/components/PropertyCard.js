@@ -1,6 +1,3 @@
-src/components/PropertyCard.js
-
-javascript
 import React from 'react';
 import {
   View,

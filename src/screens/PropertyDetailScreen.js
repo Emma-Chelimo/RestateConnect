@@ -1,6 +1,3 @@
-src/screens/PropertyDetailScreen.js
-
-javascript
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -40,13 +37,13 @@ const PropertyDetailScreen = ({ route, navigation }) => {
     try {
       const favs = await AsyncStorage.getItem('favorites');
       let favIds = favs ? JSON.parse(favs) : [];
-      
+
       if (isFavorite) {
         favIds = favIds.filter(id => id !== property.id);
       } else {
         favIds.push(property.id);
       }
-      
+
       await AsyncStorage.setItem('favorites', JSON.stringify(favIds));
       setIsFavorite(!isFavorite);
     } catch (error) {
@@ -146,6 +143,7 @@ const PropertyDetailScreen = ({ route, navigation }) => {
     </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

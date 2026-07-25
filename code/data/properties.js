@@ -1,6 +1,3 @@
-src/data/properties.js
-
-javascript
 export const properties = [
   {
     id: '1',

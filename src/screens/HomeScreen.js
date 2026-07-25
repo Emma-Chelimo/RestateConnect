@@ -1,116 +1,107 @@
-src/screens/HomeScreen.js
-
-javascript
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image,
-  TextInput,
-  StatusBar,
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { properties } from '../data/properties';
+import { properties, propertyTypes } from '../data/properties';
 import PropertyCard from '../components/PropertyCard';
 
-const ExploreScreen = ({ navigation }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredProperties, setFilteredProperties] = useState(properties);
-  const [sortBy, setSortBy] = useState('price-low');
+const HomeScreen = ({ navigation }) => {
+  const [activeCategory, setActiveCategory] = useState('all');
 
-  const handleSearch = (text) => {
-    setSearchQuery(text);
-    let filtered = properties;
-    
-    if (text) {
-      filtered = filtered.filter(p =>
-        p.title.toLowerCase().includes(text.toLowerCase()) ||
-        p.location.toLowerCase().includes(text.toLowerCase()) ||
-        p.type.toLowerCase().includes(text.toLowerCase())
-      );
-    }
-    
-    // Apply sorting
-    filtered = [...filtered].sort((a, b) => {
-      switch(sortBy) {
-        case 'price-low':
-          return a.price - b.price;
-        case 'price-high':
-          return b.price - a.price;
-        case 'newest':
-          return b.yearBuilt - a.yearBuilt;
-        default:
-          return 0;
-      }
-    });
-    
-    setFilteredProperties(filtered);
-  };
+  // Featured = the 3 highest-priced listings, just as a simple "showcase" rule for now
+  const featured = useMemo(
+    () => [...properties].sort((a, b) => b.price - a.price).slice(0, 3),
+    []
+  );
+
+  const recent = useMemo(() => {
+    if (activeCategory === 'all') return properties;
+    return properties.filter(
+      p => p.type.toLowerCase() === activeCategory.toLowerCase()
+    );
+  }, [activeCategory]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Explore Properties</Text>
-      </View>
-
-      <View style={styles.searchContainer}>
-        <Icon name="search-outline" size={24} color="#999" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search by location, type, or name..."
-          value={searchQuery}
-          onChangeText={handleSearch}
-          placeholderTextColor="#999"
-        />
-        <TouchableOpacity style={styles.filterBtn}>
-          <Icon name="options-outline" size={24} color="#2C3E8F" />
+        <View>
+          <Text style={styles.greeting}>Welcome back 👋</Text>
+          <Text style={styles.headerTitle}>Find your next home</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.searchShortcut}
+          onPress={() => navigation.navigate('Explore')}
+        >
+          <Icon name="search-outline" size={22} color="#2C3E8F" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.sortContainer}>
-        <Text style={styles.resultsCount}>{filteredProperties.length} properties found</Text>
-        <View style={styles.sortOptions}>
-          <TouchableOpacity
-            style={[styles.sortBtn, sortBy === 'price-low' && styles.sortBtnActive]}
-            onPress={() => {
-              setSortBy('price-low');
-              handleSearch(searchQuery);
-            }}
-          >
-            <Text style={[styles.sortText, sortBy === 'price-low' && styles.sortTextActive]}>
-              Price: Low-High
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.sortBtn, sortBy === 'price-high' && styles.sortBtnActive]}
-            onPress={() => {
-              setSortBy('price-high');
-              handleSearch(searchQuery);
-            }}
-          >
-            <Text style={[styles.sortText, sortBy === 'price-high' && styles.sortTextActive]}>
-              Price: High-Low
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
+      {/* Category chips */}
       <FlatList
-        data={filteredProperties}
-        renderItem={({ item }) => (
-          <PropertyCard property={item} navigation={navigation} />
-        )}
+        data={propertyTypes}
+        horizontal
         keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.categoryList}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={[
+              styles.categoryChip,
+              activeCategory === item.id && styles.categoryChipActive,
+            ]}
+            onPress={() => setActiveCategory(item.id)}
+          >
+            <Text
+              style={[
+                styles.categoryText,
+                activeCategory === item.id && styles.categoryTextActive,
+              ]}
+            >
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        )}
       />
-    </View>
+
+      {/* Featured carousel */}
+      <View style={styles.sectionHeaderRow}>
+        <Text style={styles.sectionTitle}>Featured</Text>
+      </View>
+      <FlatList
+        data={featured}
+        horizontal
+        keyExtractor={item => item.id}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.featuredList}
+        renderItem={({ item }) => (
+          <View style={styles.featuredCardWrapper}>
+            <PropertyCard property={item} navigation={navigation} />
+          </View>
+        )}
+      />
+
+      {/* Recent / category-filtered listings */}
+      <View style={styles.sectionHeaderRow}>
+        <Text style={styles.sectionTitle}>
+          {activeCategory === 'all' ? 'All Listings' : propertyTypes.find(t => t.id === activeCategory)?.label}
+        </Text>
+        <Text style={styles.sectionCount}>{recent.length} results</Text>
+      </View>
+      <View style={styles.listingsList}>
+        {recent.map(item => (
+          <PropertyCard key={item.id} property={item} navigation={navigation} />
+        ))}
+      </View>
+    </ScrollView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -118,40 +109,59 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingBottom: 15,
   },
+  greeting: {
+    fontSize: 14,
+    color: '#666',
+  },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#1A1A2E',
+    marginTop: 2,
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  searchShortcut: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#fff',
-    borderRadius: 12,
-    marginHorizontal: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 3,
   },
-  searchIcon: {
+  categoryList: {
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+    gap: 10,
+  },
+  categoryChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#fff',
     marginRight: 10,
   },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1A1A2E',
+  categoryChipActive: {
+    backgroundColor: '#2C3E8F',
   },
-  filterBtn: {
-    padding: 5,
+  categoryText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
   },
-  sortContainer: {
+  categoryTextActive: {
+    color: '#fff',
+  },
+  sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -159,35 +169,27 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 10,
   },
-  resultsCount: {
-    fontSize: 14,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1A1A2E',
+  },
+  sectionCount: {
+    fontSize: 13,
     color: '#666',
   },
-  sortOptions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  sortBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-    backgroundColor: '#fff',
-    marginLeft: 8,
-  },
-  sortBtnActive: {
-    backgroundColor: '#2C3E8F',
-  },
-  sortText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  sortTextActive: {
-    color: '#fff',
-  },
-  listContent: {
+  featuredList: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 5,
+  },
+  featuredCardWrapper: {
+    width: 260,
+    marginRight: 16,
+  },
+  listingsList: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
   },
 });
 
-export default ExploreScreen;
+export default HomeScreen;

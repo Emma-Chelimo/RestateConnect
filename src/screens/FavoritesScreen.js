@@ -1,7 +1,4 @@
-src/screens/FavoritesScreen.js
-
-javascript
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { properties } from '../data/properties';
@@ -17,10 +15,6 @@ import PropertyCard from '../components/PropertyCard';
 const FavoritesScreen = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
 
-  useEffect(() => {
-    loadFavorites();
-  }, []);
-
   const loadFavorites = async () => {
     try {
       const favs = await AsyncStorage.getItem('favorites');
@@ -28,11 +22,25 @@ const FavoritesScreen = ({ navigation }) => {
         const favIds = JSON.parse(favs);
         const favProperties = properties.filter(p => favIds.includes(p.id));
         setFavorites(favProperties);
+      } else {
+        setFavorites([]);
       }
     } catch (error) {
       console.error('Error loading favorites:', error);
     }
   };
+
+  useEffect(() => {
+    loadFavorites();
+  }, []);
+
+  // Re-check favorites every time this tab comes into focus,
+  // so toggling a heart on PropertyDetail shows up here immediately.
+  useFocusEffect(
+    useCallback(() => {
+      loadFavorites();
+    }, [])
+  );
 
   if (favorites.length === 0) {
     return (
@@ -71,6 +79,7 @@ const FavoritesScreen = ({ navigation }) => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
