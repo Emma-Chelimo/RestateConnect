@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1A1A2E',
+    color: '#b5b5f1',
   },
   searchContainer: {
     flexDirection: 'row',
