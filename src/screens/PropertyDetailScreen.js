@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { resolveImage } from '../utils/imageHelper';
 
 const { width } = Dimensions.get('window');
 
@@ -55,7 +56,7 @@ const PropertyDetailScreen = ({ route, navigation }) => {
     <ScrollView style={styles.container}>
       {/* Image Gallery */}
       <View style={styles.imageContainer}>
-        <Image source={{ uri: property.images[0] }} style={styles.mainImage} />
+        <Image source={resolveImage(property.images[0])} style={styles.mainImage} />
         <TouchableOpacity
           style={styles.backBtn}
           onPress={() => navigation.goBack()}

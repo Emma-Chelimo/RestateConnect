@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { resolveImage } from '../utils/imageHelper';
 
 const PropertyCard = ({ property, navigation }) => {
   return (
@@ -14,7 +15,7 @@ const PropertyCard = ({ property, navigation }) => {
       style={styles.card}
       onPress={() => navigation.navigate('PropertyDetail', { property })}
     >
-      <Image source={{ uri: property.images[0] }} style={styles.image} />
+      <Image source={resolveImage(property.images[0])} style={styles.image} />
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.price}>${property.price.toLocaleString()}</Text>

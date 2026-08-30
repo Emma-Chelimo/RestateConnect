@@ -30,7 +30,7 @@ const ProfileScreen = () => {
 
       <View style={styles.profileCard}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/100/2C3E8F/FFFFFF?text=User' }}
+          source={{ uri: 'https://ui-avatars.com/api/?name=John+Doe&background=2C3E8F&color=fff&size=200' }}
           style={styles.profileImage}
         />
         <Text style={styles.profileName}>John Doe</Text>
