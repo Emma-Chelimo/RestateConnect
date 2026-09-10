@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1A1A2E',
+    color: '#7c7ce4',
     marginTop: 2,
   },
   searchShortcut: {

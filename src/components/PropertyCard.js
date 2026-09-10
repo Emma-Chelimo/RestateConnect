@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1A1A2E',
+    color: '#7c7ce4',
     marginBottom: 4,
   },
   locationContainer: {
